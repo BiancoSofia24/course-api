@@ -16,7 +16,7 @@ import com.coursesystem.app.enums.EStatus;
 
 @Entity
 @Table(name = "enrollments")
-public class Enrollement {
+public class Enrollment {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class Enrollement {
     @Enumerated(EnumType.STRING)
     private EEnrollmentType type;
 
-    public Enrollement() {
+    public Enrollment() {
     }
 
     public Long getId() {

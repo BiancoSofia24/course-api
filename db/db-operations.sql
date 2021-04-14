@@ -43,7 +43,7 @@ update organizations set org_status = 'APPROVED' where id = 1;
 SELECT * FROM appcourses.courses;
 
 insert into courses (cost, description, hours, modality, name, quotas, scholarship_quotas, course_status, organizations_id)
-values (50, 'course description', '40', 'online', 'java', '15', '5', 'ENROLMENT', 1);
+values (50, 'course description', '40', 'online', 'java', '15', '5', 'ENROLLMENT', 1);
 
 update courses set course_status = 'ENROLLMENT' where id = 1;
 

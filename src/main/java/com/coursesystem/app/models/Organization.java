@@ -23,7 +23,7 @@ public class Organization {
     private Long id;
 
     private String name;
-    private Integer cuil;
+    private Long cuil;
     private String type;
     private String address;
     private String category;
@@ -53,11 +53,11 @@ public class Organization {
         this.name = name;
     }
 
-    public Integer getCuil() {
+    public Long getCuil() {
         return this.cuil;
     }
 
-    public void setCuil(Integer cuil) {
+    public void setCuil(Long cuil) {
         this.cuil = cuil;
     }
 

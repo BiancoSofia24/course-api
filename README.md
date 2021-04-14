@@ -12,5 +12,6 @@
 - Spring Boot Starter Web
 - Spring Boot Devtools
 - Spring Openapi UI
+- Spring Boot Starter Security
 
 

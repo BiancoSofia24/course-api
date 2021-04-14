@@ -19,10 +19,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepo;
 
-    public Iterable<User> findAll() {
-        return this.userRepo.findAll();
-    }
-
     public Optional<User> findByUsername(String username) {
         return this.userRepo.findByUsername(username);
     }
@@ -59,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> listingUsers() {
+    public List<User> findAll() {
         return userRepo.findAll();
     }
 

@@ -16,14 +16,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -41,15 +40,19 @@ public class UserController {
     @GetMapping(path = "/all")
     @Operation(summary = "Users List", description = "Lists all the users that exist in the database.")
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Success|OK"),
-        @ApiResponse(responseCode = "404", description = "Not Found|Fail")
-    })
     public ResponseEntity<List<User>> findAll() {
         log.info("Find all users");
-        return new ResponseEntity<>(userServImpl.listingUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userServImpl.findAll(), HttpStatus.OK);
     }
 
+    /**
+     * Update user
+     * @param id
+     * @param username
+     * @param email
+     * @param password
+     * @return
+     */
     @PutMapping(path = "/update")
     @Operation(summary = "Update user", description = "Find a user by its ID and then update the user info.")
     //public ResponseEntity<User> update(@RequestBody UserForm userForm) {
@@ -64,6 +67,7 @@ public class UserController {
             log.info("User finded!");
 
             UserForm userForm = new UserForm();
+            userForm.setId(user.getId());
             userForm.setUsername(username);
             userForm.setEmail(email);
             userForm.setPassword(password);
@@ -80,6 +84,11 @@ public class UserController {
 
     }
 
+    /**
+     * Delete user
+     * @param id
+     * @return
+     */
     @DeleteMapping(path = "/delete/{id}")
     @Operation(summary = "Delete user", description = "Find a user by its ID and then delete the user.")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
@@ -98,6 +107,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Find by ID
+     * @param id
+     * @return
+     */
     @GetMapping(path = "/find/{id}")
     @Operation(summary = "Find by ID", description = "Find a user by its ID")
     public ResponseEntity<User> findById(@PathVariable Long id) {
@@ -111,5 +125,19 @@ public class UserController {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping(path = "/new")
+    @Operation(summary = "Create user", description = "Create a new user into the database.")
+    public ResponseEntity<User> add(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
+        log.info("Creating an user");
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password);
+        log.info("Creating...");
+        user = userServImpl.save(user);
+        log.info("User created!");
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 }

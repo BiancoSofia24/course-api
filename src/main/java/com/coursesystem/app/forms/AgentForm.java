@@ -1,42 +1,13 @@
-package com.coursesystem.app.models;
+package com.coursesystem.app.forms;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-
-@Entity
-@Table(name = "agents")
-public class Agent {
+public class AgentForm {
     
-    @Id
     private Long id;
-
-    @OneToOne(fetch = FetchType.EAGER)
-    @MapsId
-    private User user;
-
-    @NotNull
     private String name;
-
-    @NotNull
     private String lastname;
-    
-    @NotNull
     private String documentType;
-    
-    @NotNull
-    private Integer documentNumber;
-
-    @NotNull
+    private Integer documentNumber; 
     private String job;
-
-    public Agent() {
-    }
 
     public Long getId() {
         return this.id;
@@ -44,14 +15,6 @@ public class Agent {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return this.user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getName() {
@@ -93,5 +56,5 @@ public class Agent {
     public void setJob(String job) {
         this.job = job;
     }
-
+    
 }

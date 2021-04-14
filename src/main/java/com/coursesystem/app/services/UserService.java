@@ -10,7 +10,7 @@ public interface UserService {
 
     public User findById(Long id) throws nonExistentIdException;
 
-    public List<User> listingUsers();
+    public List<User> findAll();
 
     public User chargeFormData(UserForm userForm, User user);
 }

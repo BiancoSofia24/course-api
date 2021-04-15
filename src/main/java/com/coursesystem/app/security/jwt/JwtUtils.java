@@ -22,10 +22,12 @@ public class JwtUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 
-	@Value("${jwt.secret}")
+	@Value("${bezkoder.app.jwtSecret}")
+	// @Value("${jwt.secret}")
 	private String jwtSecret;
 
-	@Value("${jwt.expiration}")
+	@Value("${bezkoder.app.jwtExpirationMs}")
+	// @Value("${jwt.expiration}")
 	private int jwtExpiration;
 
 	public String generateJwtToken(Authentication authentication) {

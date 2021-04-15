@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 // @CrossOrigin must have an IP to be called by the frontend
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/app/auth")
 public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -88,26 +88,26 @@ public class AuthController {
 		Set<Role> roles = new HashSet<>();
 
 		if (setRole == null) {
-			Role userRole = roleRepository.findByName(EUserRole.ROLE_STUDENT)
+			Role userRole = roleRepository.findByUserRole(EUserRole.ROLE_STUDENT)
 					.orElseThrow(() -> new RuntimeException("[ERROR] Role not found"));
 			roles.add(userRole);
 		} else {
 			setRole.forEach(role -> {
 				switch (role.toLowerCase()) {
 				case "admin":
-					Role admin = roleRepository.findByName(EUserRole.ROLE_ADMIN)
+					Role admin = roleRepository.findByUserRole(EUserRole.ROLE_ADMIN)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(admin);
 
 					break;
 				case "agent":
-					Role agent = roleRepository.findByName(EUserRole.ROLE_AGENT)
+					Role agent = roleRepository.findByUserRole(EUserRole.ROLE_AGENT)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(agent);
 
 					break;
 				default:
-					Role student = roleRepository.findByName(EUserRole.ROLE_STUDENT)
+					Role student = roleRepository.findByUserRole(EUserRole.ROLE_STUDENT)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(student);
 				}

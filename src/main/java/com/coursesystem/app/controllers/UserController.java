@@ -3,8 +3,8 @@ package com.coursesystem.app.controllers;
 import java.util.List;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.forms.UserForm;
 import com.coursesystem.app.models.User;
+import com.coursesystem.app.payload.forms.UserForm;
 import com.coursesystem.app.services.UserServiceImpl;
 
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "app/users")
 public class UserController {
     
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -39,7 +39,7 @@ public class UserController {
      */
     @GetMapping(path = "/all")
     @Operation(summary = "Users List", description = "Lists all the users that exist in the database.")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> findAll() {
         log.info("Find all users");
         return new ResponseEntity<>(userServImpl.findAll(), HttpStatus.OK);

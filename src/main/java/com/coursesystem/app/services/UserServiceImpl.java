@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.forms.UserForm;
 import com.coursesystem.app.models.User;
+import com.coursesystem.app.payload.forms.UserForm;
 import com.coursesystem.app.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

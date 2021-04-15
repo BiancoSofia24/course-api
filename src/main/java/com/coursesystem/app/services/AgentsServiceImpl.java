@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.forms.AgentForm;
 import com.coursesystem.app.models.Agent;
 import com.coursesystem.app.models.User;
+import com.coursesystem.app.payload.forms.AgentForm;
 import com.coursesystem.app.repository.AgentRepository;
 import com.coursesystem.app.repository.UserRepository;
 

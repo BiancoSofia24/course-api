@@ -13,5 +13,6 @@
 - Spring Boot Devtools
 - Spring Openapi UI
 - Spring Boot Starter Security
+- Json Web Token
 
 

@@ -1,8 +1,8 @@
 package com.coursesystem.app.services;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.forms.AgentForm;
 import com.coursesystem.app.models.Agent;
+import com.coursesystem.app.payload.forms.AgentForm;
 
 public interface AgentService {
     

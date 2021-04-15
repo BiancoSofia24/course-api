@@ -1,16 +1,16 @@
 package com.coursesystem.app.controllers;
 
-import java.util.HashSet;
+// import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+// import java.util.Optional;
+// import java.util.Set;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.forms.AgentForm;
 import com.coursesystem.app.models.Agent;
-import com.coursesystem.app.models.Role;
+//import com.coursesystem.app.models.Role;
 import com.coursesystem.app.models.User;
-import com.coursesystem.app.repository.RoleRepository;
+import com.coursesystem.app.payload.forms.AgentForm;
+//import com.coursesystem.app.repository.RoleRepository;
 import com.coursesystem.app.services.AgentsServiceImpl;
 import com.coursesystem.app.services.UserServiceImpl;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
-@RequestMapping(path = "/agents")
+@RequestMapping(path = "app/agents")
 public class AgentController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -44,8 +44,8 @@ public class AgentController {
     @Autowired
     private AgentsServiceImpl agentServImpl;
 
-    @Autowired
-    private RoleRepository roleRepo;
+    // @Autowired
+    // private RoleRepository roleRepo;
 
     /**
      * Find all users
@@ -53,7 +53,7 @@ public class AgentController {
      */
     @GetMapping(path = "/all")
     @Operation(summary = "Agents List", description = "Lists all the agents users that exist in the database.")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Agent>> findAll() {
         log.info("Find all agents users");
         return new ResponseEntity<>(agentServImpl.findAll(), HttpStatus.OK);
@@ -71,7 +71,7 @@ public class AgentController {
      */
     @PostMapping(path = "/new")
     @Operation(summary = "New agent user", description = "Add a new agent users to the database.")
-    @PreAuthorize("hasRole('AGENT')")
+    // @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Agent> add(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
         log.info("Create a new agent user");
         Agent agent = new Agent();
@@ -88,11 +88,11 @@ public class AgentController {
             agentForm.setJob(job);
 
             // Missing role for the created user
-            Optional<Role> role = roleRepo.findById(2L);
-            role.get().getUserRole();
-            Set<Role> set = new HashSet<Role>();
-            set.add(role.get());
-            agentUser.setRole(set);
+            // Optional<Role> role = roleRepo.findById(2L);
+            // role.get().getUserRole();
+            // Set<Role> set = new HashSet<Role>();
+            // set.add(role.get());
+            // agentUser.setRole(set);
 
             agent = agentServImpl.chargeFormData(agentForm, agent);
             log.info("Creating...");
@@ -112,7 +112,7 @@ public class AgentController {
      */
     @DeleteMapping(path = "/delete/{id}")
 	@Operation(summary = "Delete agent user", description = "Find a user by its ID and then delete the agent user.")
-	@PreAuthorize("hasRole('AGENT')")
+	// @PreAuthorize("hasRole('AGENT')")
 	public ResponseEntity<Object> borrarRep(@PathVariable Long id) {
 
 		log.info("Delete an agent user");
@@ -139,7 +139,7 @@ public class AgentController {
      */
     @PutMapping(path = "/update/{id}")
 	@Operation(summary = "Update agent", description = "Find an agent user by its ID and then update the user info.")
-	@PreAuthorize("hasRole('AGENT')")
+	// @PreAuthorize("hasRole('AGENT')")
 	public ResponseEntity<Agent> modificarRep(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
 
 		log.info("Metodo modificarRep: buscando rep...");

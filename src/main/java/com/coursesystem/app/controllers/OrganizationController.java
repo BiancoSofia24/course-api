@@ -63,12 +63,14 @@ public class OrganizationController {
             orgForm.setContactNumber(contactNumber);
             orgForm.setOrgStatus(EStatus.AWAITING_APPROVAL);
             orgForm.setAgentId(agentId);
-
             log.info("Validating...");
+
             org = orgServImpl.chargeFormData(orgForm, org);
             log.info("Creating...");
+
             orgServImpl.save(org);
             log.info("Organization created!");
+
             return new ResponseEntity<>(org, HttpStatus.CREATED);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
@@ -83,13 +85,14 @@ public class OrganizationController {
      */
     @PutMapping(path = "/update/{id}")
 	@Operation(summary = "Update organization", description = "Find an organization by its ID and then update the info.")
-	// @PreAuthorize("hasRole('AGENT')")
+	// @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
 	public ResponseEntity<Organization> update(@PathVariable Long id, @RequestParam String name, @RequestParam Long cuil, @RequestParam String type, @RequestParam String address, @RequestParam String category, @RequestParam Integer foundationYear, @RequestParam Integer contactNumber, @RequestParam Long agentId) {
 
 		log.info("Update an organization");
         OrganizationForm orgForm = new OrganizationForm();
 		try {
             log.info("Finding...");
+
             Organization org = orgServImpl.findById(id);
             log.info("Organization finded!");
             
@@ -102,11 +105,12 @@ public class OrganizationController {
             orgForm.setContactNumber(contactNumber);
             orgForm.setOrgStatus(org.getOrgStatus());
             orgForm.setAgentId(agentId);
-
 			log.info("Updating...");
+
 			org = orgServImpl.chargeFormData(orgForm, org);
 			orgServImpl.save(org);
 			log.info("Organization updated!");
+
 			return new ResponseEntity<>(org, HttpStatus.OK);
 
 		} catch (nonExistentIdException e) {
@@ -123,13 +127,16 @@ public class OrganizationController {
      */
     @DeleteMapping(path = "/delete/{id}")
     @Operation(summary = "Delete organization", description = "Find a organization by its ID and then delete the organization.")
+	// @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         log.info("Deleting an organization");
         Organization org;
         try {
             log.info("Finding...");
+
             org = orgServImpl.findById(id);
             log.info("Organization finded! Deleting...");
+
             orgServImpl.delete(org);
             log.info("Organization deleted!");
 
@@ -151,8 +158,11 @@ public class OrganizationController {
         log.info("Find an organization by the ID: " + id);
         Organization org;
         try {
+            log.info("Finding...");
+
             org = orgServImpl.findById(id);
             log.info("Organization finded");
+
             return new ResponseEntity<>(org, HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();

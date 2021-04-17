@@ -52,10 +52,10 @@ public class AgentController {
      * @return
      */
     @GetMapping(path = "/")
-    @Operation(summary = "Agents List", description = "Lists all the agents users that exist in the database.")
-    // @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Agents List", description = "Lists all the agents that exist in the database.")
+    // @PreAuthorize("hasRole('ADMIN') or hasRole('AGENT')")
     public ResponseEntity<List<Agent>> findAll() {
-        log.info("Find all agents users");
+        log.info("Find all agents");
         return new ResponseEntity<>(agentServImpl.findAll(), HttpStatus.OK);
     }
 
@@ -70,10 +70,10 @@ public class AgentController {
      * @return
      */
     @PostMapping(path = "/new")
-    @Operation(summary = "New agent user", description = "Add a new agent users to the database.")
+    @Operation(summary = "New agent", description = "Add a new agent to the database.")
     // @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Agent> add(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
-        log.info("Create a new agent user");
+        log.info("Create a new agent");
         Agent agent = new Agent();
         AgentForm agentForm = new AgentForm();
         try {
@@ -100,7 +100,7 @@ public class AgentController {
             log.info("Creating...");
 
             agentServImpl.save(agent);
-            log.info("Agent user created!");
+            log.info("Agent created!");
 
             return new ResponseEntity<>(agent, HttpStatus.CREATED);
         } catch (nonExistentIdException e) {
@@ -115,21 +115,21 @@ public class AgentController {
      * @return
      */
     @DeleteMapping(path = "/delete/{id}")
-	@Operation(summary = "Delete agent user", description = "Find a user by its ID and then delete the agent user.")
-	// @PreAuthorize("hasRole('AGENT')")
+	@Operation(summary = "Delete agent", description = "Find a user by its ID and then delete the agent.")
+	// @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
 	public ResponseEntity<Object> delete(@PathVariable Long id) {
 
-		log.info("Delete an agent user");
+		log.info("Delete an agent");
 		Agent agent;
 		try {
             log.info("Finding...");
         
 			agent = agentServImpl.findById(id);
-			log.info("User finded. Deleting...");
+			log.info("Agent finded. Deleting...");
 
 			agentServImpl.delete(agent);
             userServImpl.delete(agent.getUser());
-			log.info("User deleted!");
+			log.info("Agent deleted!");
 
 			return new ResponseEntity<>(null, HttpStatus.OK);
 
@@ -150,18 +150,18 @@ public class AgentController {
      * @return
      */
     @PutMapping(path = "/update/{id}")
-	@Operation(summary = "Update agent", description = "Find an agent user by its ID and then update the user info.")
+	@Operation(summary = "Update agent", description = "Find an agent by its ID and then update the agent info.")
 	// @PreAuthorize("hasRole('AGENT')")
 	public ResponseEntity<Agent> update(@PathVariable Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
 
-		log.info("Update an agent user");
+		log.info("Update an agent");
         AgentForm agentForm = new AgentForm();
 		try {
             log.info("Finding...");
 
             User agentUser = userServImpl.findById(id);
             Agent agent = agentServImpl.findById(agentUser.getId());
-            log.info("User finded!");
+            log.info("Agent finded!");
             
             agentForm.setId(agentUser.getId());
             agentForm.setName(name);
@@ -173,7 +173,7 @@ public class AgentController {
 
 			agent = agentServImpl.chargeFormData(agentForm, agent);
 			agentServImpl.save(agent);
-			log.info("User updated!");
+			log.info("Agent updated!");
 
 			return new ResponseEntity<>(agent, HttpStatus.OK);
 
@@ -190,9 +190,9 @@ public class AgentController {
      * @return
      */
     @GetMapping(path = "/{id}")
-    @Operation(summary = "Find by ID", description = "Find an agent user by its ID")
+    @Operation(summary = "Find by ID", description = "Find an agent by its ID")
     public ResponseEntity<Agent> findById(@PathVariable Long id) {
-        log.info("Find an agent user by the ID: " + id);
+        log.info("Find an agent by the ID: " + id);
         Agent agent;
         try {
             log.info("Finding...");

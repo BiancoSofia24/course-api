@@ -23,7 +23,7 @@ public class AgentsServiceImpl implements AgentService {
     private AgentRepository agentRepo;
 
     public List<Agent> findAll() {
-        return agentRepo.findAll();
+        return this.agentRepo.findAll();
     }
 
     public Agent save(Agent agent) {
@@ -38,9 +38,11 @@ public class AgentsServiceImpl implements AgentService {
     @Override
     public Agent findById(Long id) throws nonExistentIdException {
         Optional<Agent> optionalAgent = agentRepo.findById(id);
+        
         if (Optional.empty().equals(optionalAgent)) {
             throw new nonExistentIdException("The given id doesn't exists");
         }
+
         Agent agent = optionalAgent.get();
         return agent;
     }
@@ -48,9 +50,11 @@ public class AgentsServiceImpl implements AgentService {
     @Override
     public Agent chargeFormData(AgentForm agentForm, Agent agent) throws nonExistentIdException {
         Optional<User> optionalUser = userRepo.findById(agentForm.getId());
+
         if (Optional.empty().equals(optionalUser)) {
             throw new nonExistentIdException("The given id doesn't exists");
         }
+        
         User user = optionalUser.get();
         agent.setUser(user);
         agent.setName(agentForm.getName());
@@ -58,6 +62,7 @@ public class AgentsServiceImpl implements AgentService {
         agent.setDocumentType(agentForm.getDocumentType());
         agent.setDocumentNumber(agentForm.getDocumentNumber());
         agent.setJob(agentForm.getJob());
+        
         return agent;
     }
 }

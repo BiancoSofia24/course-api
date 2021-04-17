@@ -51,7 +51,7 @@ public class AgentController {
      * Find all users
      * @return
      */
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/")
     @Operation(summary = "Agents List", description = "Lists all the agents users that exist in the database.")
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Agent>> findAll() {
@@ -95,10 +95,13 @@ public class AgentController {
             // agentUser.setRole(set);
 
             log.info("Validating...");
+
             agent = agentServImpl.chargeFormData(agentForm, agent);
             log.info("Creating...");
+
             agentServImpl.save(agent);
             log.info("Agent user created!");
+
             return new ResponseEntity<>(agent, HttpStatus.CREATED);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
@@ -114,17 +117,20 @@ public class AgentController {
     @DeleteMapping(path = "/delete/{id}")
 	@Operation(summary = "Delete agent user", description = "Find a user by its ID and then delete the agent user.")
 	// @PreAuthorize("hasRole('AGENT')")
-	public ResponseEntity<Object> borrarRep(@PathVariable Long id) {
+	public ResponseEntity<Object> delete(@PathVariable Long id) {
 
 		log.info("Delete an agent user");
 		Agent agent;
 		try {
             log.info("Finding...");
+        
 			agent = agentServImpl.findById(id);
 			log.info("User finded. Deleting...");
+
 			agentServImpl.delete(agent);
             userServImpl.delete(agent.getUser());
 			log.info("User deleted!");
+
 			return new ResponseEntity<>(null, HttpStatus.OK);
 
 		} catch (nonExistentIdException e) {
@@ -135,18 +141,24 @@ public class AgentController {
 
     /**
      * Update an agent user
-     * @param repForm
+     * @param id
+     * @param name
+     * @param lastname
+     * @param documentType
+     * @param documentNumber
+     * @param job
      * @return
      */
     @PutMapping(path = "/update/{id}")
 	@Operation(summary = "Update agent", description = "Find an agent user by its ID and then update the user info.")
 	// @PreAuthorize("hasRole('AGENT')")
-	public ResponseEntity<Agent> modificarRep(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
+	public ResponseEntity<Agent> update(@PathVariable Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
 
 		log.info("Update an agent user");
         AgentForm agentForm = new AgentForm();
 		try {
             log.info("Finding...");
+
             User agentUser = userServImpl.findById(id);
             Agent agent = agentServImpl.findById(agentUser.getId());
             log.info("User finded!");
@@ -157,11 +169,12 @@ public class AgentController {
             agentForm.setDocumentType(documentType);
             agentForm.setDocumentNumber(documentNumber);
             agentForm.setJob(job);
-
 			log.info("Updating...");
+
 			agent = agentServImpl.chargeFormData(agentForm, agent);
 			agentServImpl.save(agent);
 			log.info("User updated!");
+
 			return new ResponseEntity<>(agent, HttpStatus.OK);
 
 		} catch (nonExistentIdException e) {
@@ -170,4 +183,27 @@ public class AgentController {
 		}
 
 	}
+
+    /**
+     * Find by ID
+     * @param id
+     * @return
+     */
+    @GetMapping(path = "/{id}")
+    @Operation(summary = "Find by ID", description = "Find an agent user by its ID")
+    public ResponseEntity<Agent> findById(@PathVariable Long id) {
+        log.info("Find an agent user by the ID: " + id);
+        Agent agent;
+        try {
+            log.info("Finding...");
+
+            agent = agentServImpl.findById(id);
+            log.info("Agent finded!");
+            
+            return new ResponseEntity<>(agent, HttpStatus.OK);
+        } catch (nonExistentIdException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

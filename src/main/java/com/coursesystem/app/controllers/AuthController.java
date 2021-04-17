@@ -67,7 +67,11 @@ public class AuthController {
 				.collect(Collectors.toList());
 
         return ResponseEntity.ok(
-            new JwtResponse(jwt, userDetailsImpl.getId(), userDetailsImpl.getUsername(), userDetailsImpl.getEmail(), roles)
+            new JwtResponse(jwt, 
+				userDetailsImpl.getId(), 
+				userDetailsImpl.getUsername(), 
+				userDetailsImpl.getEmail(), 
+				roles)
         );
 	}
 
@@ -81,8 +85,7 @@ public class AuthController {
 			return ResponseEntity.badRequest().body(new MessageResponse("[ERROR] Email in user"));
 		}
 
-		User user = new User(singupForm.getUsername(), singupForm.getEmail(),
-				encoder.encode(singupForm.getPassword()));
+		User user = new User(singupForm.getUsername(), singupForm.getEmail(), encoder.encode(singupForm.getPassword()));
 
 		Set<String> setRole = singupForm.getRole();
 		Set<Role> roles = new HashSet<>();
@@ -96,19 +99,19 @@ public class AuthController {
 				switch (role.toLowerCase()) {
 				case "admin":
 					Role admin = roleRepository.findByUserRole(EUserRole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("[ERROR] Role not found"));
 					roles.add(admin);
 
 					break;
 				case "agent":
 					Role agent = roleRepository.findByUserRole(EUserRole.ROLE_AGENT)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("[ERROR] Role not found"));
 					roles.add(agent);
 
 					break;
 				default:
 					Role student = roleRepository.findByUserRole(EUserRole.ROLE_STUDENT)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("[ERROR] Role not found"));
 					roles.add(student);
 				}
 			});

@@ -37,7 +37,7 @@ public class UserController {
      * Find all users
      * @return
      */
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/")
     @Operation(summary = "Users List", description = "Lists all the users that exist in the database.")
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> findAll() {
@@ -61,9 +61,8 @@ public class UserController {
         User user;
         try {
             log.info("Finding...");
-            // Error. Doesn't find any ID (The given id must not be null!)
-            //user = userServImpl.findById(userForm.getId());
             user = userServImpl.findById(id);
+            
             log.info("User finded!");
 
             UserForm userForm = new UserForm();
@@ -74,8 +73,10 @@ public class UserController {
 
             user = userServImpl.chargeFormData(userForm, user);
             log.info("Updating...");
+            
             userServImpl.save(user);
             log.info("User updated!");
+
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
@@ -96,10 +97,13 @@ public class UserController {
         User user;
         try {
             log.info("Finding...");
+
             user = userServImpl.findById(id);
             log.info("User finded! Deleting...");
+
             userServImpl.delete(user);
             log.info("User deleted!");
+
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
@@ -112,14 +116,17 @@ public class UserController {
      * @param id
      * @return
      */
-    @GetMapping(path = "/find/{id}")
-    @Operation(summary = "Find by ID", description = "Find a user by its ID")
+    @GetMapping(path = "/{id}")
+    @Operation(summary = "Find by ID", description = "Find an user by its ID")
     public ResponseEntity<User> findById(@PathVariable Long id) {
-        log.info("Find a user by the ID: " + id);
+        log.info("Find an user by the ID: " + id);
         User user;
         try {
+            log.info("Finding...");
             user = userServImpl.findById(id);
-            log.info("User finded");
+
+            log.info("User finded!");
+
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
@@ -127,17 +134,22 @@ public class UserController {
         }
     }
 
+    /* Test Method */
     @PostMapping(path = "/new")
     @Operation(summary = "Create user", description = "Create a new user into the database.")
     public ResponseEntity<User> add(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
         log.info("Creating an user");
+
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
+        
         log.info("Creating...");
         user = userServImpl.save(user);
+        
         log.info("User created!");
+
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 }

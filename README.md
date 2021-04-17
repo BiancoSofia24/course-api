@@ -2,6 +2,8 @@
 
 # Course System
 
+This project is intended the create an API / service REST that allows management scholarships and course quotas in different categories.
+
 - Usign Maven & Spring Boot
 
 ## Dependencies

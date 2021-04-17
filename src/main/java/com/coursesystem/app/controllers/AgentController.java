@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RequestMapping(path = "app/agents")
 public class AgentController {
 
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(AgentController.class);
     
     @Autowired
     private UserServiceImpl userServImpl;
@@ -94,6 +94,7 @@ public class AgentController {
             // set.add(role.get());
             // agentUser.setRole(set);
 
+            log.info("Validating...");
             agent = agentServImpl.chargeFormData(agentForm, agent);
             log.info("Creating...");
             agentServImpl.save(agent);
@@ -142,7 +143,7 @@ public class AgentController {
 	// @PreAuthorize("hasRole('AGENT')")
 	public ResponseEntity<Agent> modificarRep(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
 
-		log.info("Metodo modificarRep: buscando rep...");
+		log.info("Update an agent user");
         AgentForm agentForm = new AgentForm();
 		try {
             log.info("Finding...");

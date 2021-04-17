@@ -53,10 +53,10 @@ public class UserController {
      * @param password
      * @return
      */
-    @PutMapping(path = "/update")
+    @PutMapping(path = "/update/{id}")
     @Operation(summary = "Update user", description = "Find a user by its ID and then update the user info.")
-    //public ResponseEntity<User> update(@RequestBody UserForm userForm) {
-    public ResponseEntity<User> update(@RequestParam Long id, @RequestParam String username, @RequestParam String email, @RequestParam String password) {
+    // @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestParam String username, @RequestParam String email, @RequestParam String password) {
         log.info("Updating an user");
         User user;
         try {

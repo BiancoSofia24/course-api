@@ -27,7 +27,7 @@ public class AgentsServiceImpl implements AgentService {
     }
 
     public Agent save(Agent agent) {
-        agentRepo.save(agent);
+        this.agentRepo.save(agent);
         return agent;
     }
 

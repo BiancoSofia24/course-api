@@ -8,7 +8,7 @@ public interface OrganizationService {
     
     public Organization findById(Long id) throws nonExistentIdException;
     
-    public Organization chargeFormData(OrganizationForm agentForm, Organization agent) throws nonExistentIdException;
+    public Organization chargeFormData(OrganizationForm orgForm, Organization org) throws nonExistentIdException;
 
     public Organization findByIdAndCategory(Long id, String category) throws nonExistentIdException;
 

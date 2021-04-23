@@ -13,7 +13,7 @@ public interface CourseService {
     
     public Course findById(Long id) throws nonExistentIdException;
 
-    public Course chargeFormCourse(CourseForm courseForm, Course course) throws nonExistentIdException;
+    public Course chargeFormData(CourseForm courseForm) throws nonExistentIdException;
 
     public List<Course> findByCategory(String category);
 

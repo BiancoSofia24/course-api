@@ -60,7 +60,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User chargeFormData(UserForm userForm, User user) {
+    public User chargeFormData(UserForm userForm) {
+        User user = new User();
         user.setUsername(userForm.getUsername());
         user.setEmail(userForm.getEmail());
         user.setPassword(userForm.getPassword());

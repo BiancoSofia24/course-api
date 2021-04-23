@@ -48,13 +48,14 @@ public class AgentsServiceImpl implements AgentService {
     }
 
     @Override
-    public Agent chargeFormData(AgentForm agentForm, Agent agent) throws nonExistentIdException {
+    public Agent chargeFormData(AgentForm agentForm) throws nonExistentIdException {
         Optional<User> optionalUser = userRepo.findById(agentForm.getId());
 
         if (Optional.empty().equals(optionalUser)) {
             throw new nonExistentIdException("The given id doesn't exists");
         }
         
+        Agent agent = new Agent();
         User user = optionalUser.get();
         agent.setUser(user);
         agent.setName(agentForm.getName());

@@ -92,12 +92,11 @@ public class StudentController {
      * @param job
      * @return
      */
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     @Operation(summary = "New agent", description = "Add a new agent to the database.")
     // @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Student> add(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname,@Parameter(description = "dd/MM/yyyy") @RequestParam String birthday, @Parameter(description = "F | M") @RequestParam String gender, @RequestParam String location) {
         log.info("Create a new agent");
-        Student student = new Student();
         StudentForm studentForm = new StudentForm();
         try {
             log.info("Requesting data...");
@@ -119,7 +118,7 @@ public class StudentController {
 
             log.info("Validating...");
 
-            student = studentServImpl.chargeFormData(studentForm, student);
+            Student student = studentServImpl.chargeFormData(studentForm);
             log.info("Creating...");
 
             studentServImpl.save(student);
@@ -164,7 +163,7 @@ public class StudentController {
             studentForm.setLocation(location);
 			log.info("Updating...");
 
-			student = studentServImpl.chargeFormData(studentForm, student);
+			student = studentServImpl.chargeFormData(studentForm);
 			studentServImpl.save(student);
 			log.info("Student updated!");
 
@@ -264,11 +263,12 @@ public class StudentController {
 		Student student;
         try {
             log.info("Finding...");
-        
+            
 			student = studentServImpl.findById(id);
+            student = studentServImpl.changeScholarshipStatus(id, status);
 			log.info("Student finded. Updating scholarship status...");
 
-            student = studentServImpl.changeScholarshipStatus(id, status);
+            studentServImpl.save(student);
             log.info("Scholarship status updated!");
 
             return new ResponseEntity<>(student, HttpStatus.OK);

@@ -9,7 +9,7 @@ public interface StudentService {
     
     public Student findById(Long id) throws nonExistentIdException;
     
-    public Student chargeFormData(StudentForm studentForm, Student student) throws nonExistentIdException;
+    public Student chargeFormData(StudentForm studentForm) throws nonExistentIdException;
 
     public Student chargeSEFormData(SocioEconomicForm seForm, Student student) throws nonExistentIdException;
     

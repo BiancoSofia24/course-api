@@ -13,6 +13,7 @@ public class CourseForm {
     private Integer quotas;
     private Integer scholarshipQuotas;
     private ECourseStatus courseStatus;
+    private Long orgId;
 
     public Long getId() {
         return this.id;
@@ -84,6 +85,14 @@ public class CourseForm {
 
     public void setCourseStatus(ECourseStatus courseStatus) {
         this.courseStatus = courseStatus;
+    }
+
+    public Long getOrgID() {
+        return this.orgId;
+    }
+
+    public void setOrgId(Long orgId) {
+        this.orgId = orgId;
     }
 
 }

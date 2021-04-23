@@ -53,13 +53,14 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Organization chargeFormData(OrganizationForm orgForm, Organization org) throws nonExistentIdException {
+    public Organization chargeFormData(OrganizationForm orgForm) throws nonExistentIdException {
         Optional<Agent> optionalAgent = agentRepo.findById(orgForm.getAgentId());
 
         if (Optional.empty().equals(optionalAgent)) {
             throw new nonExistentIdException("The given id doesn't exist");
         }
 
+        Organization org = new Organization();
         Agent agent = optionalAgent.get();
 
         org.setName(orgForm.getName());

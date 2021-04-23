@@ -45,12 +45,11 @@ public class OrganizationController {
         return new ResponseEntity<>(orgServImpl.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     @Operation(summary = "New organization", description = "Add a new organization to the database.")
     // @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Organization> add(@RequestParam String name, @RequestParam Long cuil, @RequestParam String type, @RequestParam String address, @RequestParam String category, @RequestParam Integer foundationYear, @RequestParam Integer contactNumber, @RequestParam Long agentId) {
         log.info("Create a new organization");
-        Organization org = new Organization();
         OrganizationForm orgForm = new OrganizationForm();
         try {
             log.info("Requesting data...");
@@ -66,7 +65,7 @@ public class OrganizationController {
             orgForm.setAgentId(agentId);
             log.info("Validating...");
 
-            org = orgServImpl.chargeFormData(orgForm, org);
+            Organization org = orgServImpl.chargeFormData(orgForm);
             log.info("Creating...");
 
             orgServImpl.save(org);
@@ -108,7 +107,7 @@ public class OrganizationController {
             orgForm.setAgentId(agentId);
 			log.info("Updating...");
 
-			org = orgServImpl.chargeFormData(orgForm, org);
+			org = orgServImpl.chargeFormData(orgForm);
 			orgServImpl.save(org);
 			log.info("Organization updated!");
 
@@ -147,6 +146,7 @@ public class OrganizationController {
             return new ResponseEntity<>("The given id doesn't exists", HttpStatus.BAD_REQUEST);
 
         } catch (invalidStatusException e) {
+            e.printStackTrace();
             return new ResponseEntity<>("Organization can't be deleted. Status must be CANCELLED", HttpStatus.FORBIDDEN);
         }
     }
@@ -189,9 +189,10 @@ public class OrganizationController {
             log.info("Finding...");
         
 			org = orgServImpl.findById(id);
+            org = orgServImpl.changeOrgStatus(id, status);
 			log.info("Organization finded. Updating scholarship status...");
 
-            org = orgServImpl.changeOrgStatus(id, status);
+            orgServImpl.save(org);
             log.info("Organization status updated!");
 
             return new ResponseEntity<>(org, HttpStatus.OK);

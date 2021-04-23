@@ -52,7 +52,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student chargeFormData(StudentForm studentForm, Student student) throws nonExistentIdException {
+    public Student chargeFormData(StudentForm studentForm) throws nonExistentIdException {
         Optional<User> optionalUser = userRepo.findById(studentForm.getId());
 
         // Missing validations
@@ -61,6 +61,7 @@ public class StudentServiceImpl implements StudentService {
             throw new nonExistentIdException("The given id doesn't exist");
         }
 
+        Student student = new Student();
         User user = optionalUser.get();
         student.setUser(user);
         student.setName(studentForm.getName());
@@ -133,7 +134,7 @@ public class StudentServiceImpl implements StudentService {
         }
 
         Student student = optionalStudent.get();
-        
+
         switch (status.toUpperCase()) {
             case "APPROVED": 
                 student.setScholarshipStatus(EStatus.APPROVED);

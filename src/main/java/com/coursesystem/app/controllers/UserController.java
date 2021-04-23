@@ -64,14 +64,14 @@ public class UserController {
             user = userServImpl.findById(id);
             
             log.info("User finded!");
-
+            
             UserForm userForm = new UserForm();
             userForm.setId(user.getId());
             userForm.setUsername(username);
             userForm.setEmail(email);
             userForm.setPassword(password);
-
-            user = userServImpl.chargeFormData(userForm, user);
+            
+            user = userServImpl.chargeFormData(userForm);
             log.info("Updating...");
             
             userServImpl.save(user);
@@ -135,7 +135,7 @@ public class UserController {
     }
 
     /* Test Method */
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     @Operation(summary = "Create user", description = "Create a new user into the database.")
     public ResponseEntity<User> add(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
         log.info("Creating an user");

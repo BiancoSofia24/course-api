@@ -12,6 +12,6 @@ public interface UserService {
 
     public List<User> findAll();
 
-    public User chargeFormData(UserForm userForm, User user);
+    public User chargeFormData(UserForm userForm);
 }
 

@@ -1,8 +1,11 @@
 package com.coursesystem.app.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.coursesystem.app.enums.ECourseStatus;
+import com.coursesystem.app.enums.EStatus;
+import com.coursesystem.app.exceptions.invalidStatusException;
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Course;
 import com.coursesystem.app.models.Organization;
@@ -31,16 +34,47 @@ public class CourseServiceImpl implements CourseService {
         return this.courseRepo.findAll();
     }
 
-    @Override
-    public Course findById(Long id) throws nonExistentIdException {
-        // TODO Auto-generated method stub
-        return null;
+    public Course save(Course course) throws invalidStatusException {
+        if (course.getOrg().getOrgStatus() == EStatus.APPROVED) {
+            this.courseRepo.save(course);
+            return course;
+        } else {
+            throw new invalidStatusException("Course can't be created. Organization status must be APPROVED");
+        }
     }
 
     @Override
-    public Course chargeFormCourse(CourseForm courseForm, Course course) throws nonExistentIdException {
-        // TODO Auto-generated method stub
-        return null;
+    public Course findById(Long id) throws nonExistentIdException {
+        Optional<Course> optionalCourse = courseRepo.findById(id);
+
+        if (Optional.empty().equals(optionalCourse)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+        Course course = optionalCourse.get();
+        return course;
+    }
+
+    @Override
+    public Course chargeFormData(CourseForm courseForm) throws nonExistentIdException {
+        Optional<Organization> optionalOrg = orgRepo.findById(courseForm.getOrgID());
+
+        if (Optional.empty().equals(optionalOrg)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Course course = new Course();
+        Organization org = optionalOrg.get();
+
+        course.setName(courseForm.getName());
+        course.setDescription(courseForm.getDescription());
+        course.setModality(courseForm.getModality());
+        course.setCost(courseForm.getCost());
+        course.setHours(courseForm.getHours());
+        course.setQuotas(courseForm.getQuotas());
+        course.setScholarshipQuotas(courseForm.getScholarshipQuotas());
+        course.setCourseStatus(courseForm.getCourseStatus());
+        course.setOrg(org);
+        return course;
     }
 
     @Override

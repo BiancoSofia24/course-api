@@ -48,7 +48,7 @@ public class AgentController {
     private RoleRepository roleRepo;
 
     /**
-     * Find all users
+     * Find all agents
      * @return
      */
     @GetMapping(path = "/")
@@ -69,12 +69,11 @@ public class AgentController {
      * @param job
      * @return
      */
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     @Operation(summary = "New agent", description = "Add a new agent to the database.")
     // @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Agent> add(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname, @Parameter(description = "DNI | PAS | CI") @RequestParam String documentType, @RequestParam Integer documentNumber, @RequestParam String job) {
         log.info("Create a new agent");
-        Agent agent = new Agent();
         AgentForm agentForm = new AgentForm();
         try {
             log.info("Requesting data...");
@@ -96,7 +95,7 @@ public class AgentController {
 
             log.info("Validating...");
 
-            agent = agentServImpl.chargeFormData(agentForm, agent);
+            Agent agent = agentServImpl.chargeFormData(agentForm);
             log.info("Creating...");
 
             agentServImpl.save(agent);
@@ -171,7 +170,7 @@ public class AgentController {
             agentForm.setJob(job);
 			log.info("Updating...");
 
-			agent = agentServImpl.chargeFormData(agentForm, agent);
+			agent = agentServImpl.chargeFormData(agentForm);
 			agentServImpl.save(agent);
 			log.info("Agent updated!");
 

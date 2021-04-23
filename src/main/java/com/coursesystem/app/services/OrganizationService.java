@@ -12,4 +12,6 @@ public interface OrganizationService {
 
     public Organization findByIdAndCategory(Long id, String category) throws nonExistentIdException;
 
+    public Organization changeOrgStatus(Long id, String status) throws nonExistentIdException;
+
 }

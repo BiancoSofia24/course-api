@@ -1,6 +1,7 @@
 package com.coursesystem.app.controllers;
 
 import com.coursesystem.app.enums.EStatus;
+import com.coursesystem.app.exceptions.invalidStatusException;
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Organization;
 import com.coursesystem.app.payload.forms.OrganizationForm;
@@ -140,10 +141,13 @@ public class OrganizationController {
             orgServImpl.delete(org);
             log.info("Organization deleted!");
 
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>("Organization deleted!", HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("The given id doesn't exists", HttpStatus.BAD_REQUEST);
+
+        } catch (invalidStatusException e) {
+            return new ResponseEntity<>("Organization can't be deleted. Status must be CANCELLED", HttpStatus.FORBIDDEN);
         }
     }
 
@@ -161,12 +165,39 @@ public class OrganizationController {
             log.info("Finding...");
 
             org = orgServImpl.findById(id);
-            log.info("Organization finded");
+            log.info("Organization finded!");
 
             return new ResponseEntity<>(org, HttpStatus.OK);
         } catch (nonExistentIdException e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Update organization status
+     * @param id
+     * @return
+     */
+    @PutMapping(path = "/status/{id}")
+	@Operation(summary = "Update organization status", description = "Find an organizations by its ID and then update the organization status.")
+	// @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<Object> changeOrgStatus(@PathVariable Long id, @RequestParam String status) {
+        log.info("Update organizations status");
+		Organization org;
+        try {
+            log.info("Finding...");
+        
+			org = orgServImpl.findById(id);
+			log.info("Organization finded. Updating scholarship status...");
+
+            org = orgServImpl.changeOrgStatus(id, status);
+            log.info("Organization status updated!");
+
+            return new ResponseEntity<>(org, HttpStatus.OK);
+        } catch (nonExistentIdException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("The give id doesn't exists", HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import com.coursesystem.app.enums.EStatus;
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Student;
 import com.coursesystem.app.models.User;
@@ -113,11 +114,41 @@ public class StudentServiceImpl implements StudentService {
         }
         
         student.setDependents(seForm.getDependents());
-        student.setScholarshipStatus(student.getScholarshipStatus());
+
+        if (student.getScholarshipStatus() == null) {
+            student.setScholarshipStatus(EStatus.AWAITING_APPROVAL);
+        } else {
+            student.setScholarshipStatus(student.getScholarshipStatus());
+        }
 
         return student;
     }
 
-    
+    @Override
+    public Student changeScholarshipStatus(Long id, String status) throws nonExistentIdException {
+        Optional<Student> optionalStudent = studentRepo.findById(id);
+
+        if (Optional.empty().equals(optionalStudent)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Student student = optionalStudent.get();
+        
+        switch (status.toUpperCase()) {
+            case "APPROVED": 
+                student.setScholarshipStatus(EStatus.APPROVED);
+                break;
+            case "REJECTED": 
+                student.setScholarshipStatus(EStatus.REJECTED);
+                break;
+            case "CANCELLED": 
+                student.setScholarshipStatus(EStatus.CANCELLED);
+                break;
+            default:
+                break;
+        }
+
+        return student;
+    }
     
 }

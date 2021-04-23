@@ -1,16 +1,16 @@
 package com.coursesystem.app.controllers;
 
-// import java.util.HashSet;
+import java.util.HashSet;
 import java.util.List;
-// import java.util.Optional;
-// import java.util.Set;
+import java.util.Optional;
+import java.util.Set;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Agent;
-//import com.coursesystem.app.models.Role;
+import com.coursesystem.app.models.Role;
 import com.coursesystem.app.models.User;
 import com.coursesystem.app.payload.forms.AgentForm;
-//import com.coursesystem.app.repository.RoleRepository;
+import com.coursesystem.app.repository.RoleRepository;
 import com.coursesystem.app.services.AgentsServiceImpl;
 import com.coursesystem.app.services.UserServiceImpl;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +44,8 @@ public class AgentController {
     @Autowired
     private AgentsServiceImpl agentServImpl;
 
-    // @Autowired
-    // private RoleRepository roleRepo;
+    @Autowired
+    private RoleRepository roleRepo;
 
     /**
      * Find all users
@@ -88,11 +88,11 @@ public class AgentController {
             agentForm.setJob(job);
 
             // Missing role for the created user
-            // Optional<Role> role = roleRepo.findById(2L);
-            // role.get().getUserRole();
-            // Set<Role> set = new HashSet<Role>();
-            // set.add(role.get());
-            // agentUser.setRole(set);
+            Optional<Role> role = roleRepo.findById(2L);
+            role.get().getUserRole();
+            Set<Role> set = new HashSet<Role>();
+            set.add(role.get());
+            agentUser.setRole(set);
 
             log.info("Validating...");
 
@@ -131,11 +131,11 @@ public class AgentController {
             userServImpl.delete(agent.getUser());
 			log.info("Agent deleted!");
 
-			return new ResponseEntity<>(null, HttpStatus.OK);
+			return new ResponseEntity<>("Agent deleted!", HttpStatus.OK);
 
 		} catch (nonExistentIdException e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("The given id doesn't exists", HttpStatus.BAD_REQUEST);
 		}
 	}
 

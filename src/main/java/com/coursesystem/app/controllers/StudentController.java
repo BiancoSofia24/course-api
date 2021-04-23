@@ -192,7 +192,7 @@ public class StudentController {
 	// @PreAuthorize("hasRole('AGENT')")
 	public ResponseEntity<Student> updateSocioEconomicData(@PathVariable Long id, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer studying, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer working, @RequestParam Float income, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer familyInCharge, @RequestParam Integer dependents) {
 
-		log.info("Update an agent");
+		log.info("Update socioeconomic data from an student");
         SocioEconomicForm seForm = new SocioEconomicForm();
 		try {
             log.info("Finding...");
@@ -243,11 +243,38 @@ public class StudentController {
             userServImpl.delete(student.getUser());
 			log.info("Student deleted!");
 
-			return new ResponseEntity<>(null, HttpStatus.OK);
+			return new ResponseEntity<>("Student deleted!", HttpStatus.OK);
 
 		} catch (nonExistentIdException e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("The given id doesn't exists", HttpStatus.BAD_REQUEST);
 		}
 	}
+
+    /**
+     * Update scholarship status
+     * @param id
+     * @return
+     */
+    @PutMapping(path = "/status/{id}")
+	@Operation(summary = "Update scholarship status", description = "Find an user by its ID and then update the scholarship status.")
+	// @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<Object> changeScholarshipStatus(@PathVariable Long id, @RequestParam String status) {
+        log.info("Update scholarship status");
+		Student student;
+        try {
+            log.info("Finding...");
+        
+			student = studentServImpl.findById(id);
+			log.info("Student finded. Updating scholarship status...");
+
+            student = studentServImpl.changeScholarshipStatus(id, status);
+            log.info("Scholarship status updated!");
+
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (nonExistentIdException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("The given id doesn't exists", HttpStatus.BAD_REQUEST);
+        }
+    }
 }

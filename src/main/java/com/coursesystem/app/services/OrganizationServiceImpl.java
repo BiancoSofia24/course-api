@@ -2,7 +2,9 @@ package com.coursesystem.app.services;
 
 import java.util.Optional;
 
+import com.coursesystem.app.enums.EStatus;
 import com.coursesystem.app.exceptions.nonExistentIdException;
+import com.coursesystem.app.exceptions.invalidStatusException;
 import com.coursesystem.app.models.Agent;
 import com.coursesystem.app.models.Organization;
 import com.coursesystem.app.payload.forms.OrganizationForm;
@@ -18,11 +20,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private AgentRepository agentRepo;
 
-    @Autowired 
+    @Autowired
     private OrganizationRepository orgRepo;
 
     public Iterable<Organization> findAll() {
-        return orgRepo.findAll();
+        return this.orgRepo.findAll();
     }
 
     public Organization save(Organization org) {
@@ -30,8 +32,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         return org;
     }
 
-    public void delete(Organization org) {
-        this.orgRepo.delete(org);
+    public void delete(Organization org) throws invalidStatusException {
+        if (org.getOrgStatus() == EStatus.CANCELLED) {
+            this.orgRepo.delete(org);
+        } else {
+            throw new invalidStatusException("Can't be deleted. Status must be CANCELLED");
+        }
     }
 
     @Override
@@ -52,8 +58,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         if (Optional.empty().equals(optionalAgent)) {
             throw new nonExistentIdException("The given id doesn't exist");
-        }   
-        
+        }
+
         Agent agent = optionalAgent.get();
 
         org.setName(orgForm.getName());
@@ -70,7 +76,33 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public Organization findByIdAndCategory(Long id, String category) throws nonExistentIdException {
+        // To do
         return null;
     }
-    
+
+    @Override
+    public Organization changeOrgStatus(Long id, String status) throws nonExistentIdException {
+        Optional<Organization> optionalOrg = orgRepo.findById(id);
+
+        if (Optional.empty().equals(optionalOrg)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Organization org = optionalOrg.get();
+
+        switch (status.toUpperCase()) {
+        case "APPROVED":
+            org.setOrgStatus(EStatus.APPROVED);
+            break;
+        case "REJECTED":
+            org.setOrgStatus(EStatus.REJECTED);
+            break;
+        case "CANCELLED":
+            org.setOrgStatus(EStatus.CANCELLED);
+            break;
+        }
+
+        return org;
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.coursesystem.app.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.coursesystem.app.enums.ECourseStatus;
@@ -9,9 +8,7 @@ import com.coursesystem.app.exceptions.invalidStatusException;
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Course;
 import com.coursesystem.app.models.Organization;
-import com.coursesystem.app.models.Student;
 import com.coursesystem.app.payload.forms.CourseForm;
-import com.coursesystem.app.repository.AgentRepository;
 import com.coursesystem.app.repository.CourseRepository;
 import com.coursesystem.app.repository.OrganizationRepository;
 
@@ -20,9 +17,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CourseServiceImpl implements CourseService {
-
-    @Autowired
-    private AgentRepository agentRepo;
 
     @Autowired
     private OrganizationRepository orgRepo;
@@ -35,18 +29,20 @@ public class CourseServiceImpl implements CourseService {
     }
 
     public Course save(Course course) throws invalidStatusException {
-        if (course.getOrg().getOrgStatus() == EStatus.APPROVED) {
-            this.courseRepo.save(course);
+        if (course.getOrg().getOrgStatus() == EStatus.APPROVED && course.getCourseStatus() == null) {
+            course.setCourseStatus(ECourseStatus.ENROLLMENT);
+        } else if (course.getCourseStatus() != null) {
+            course.setCourseStatus(course.getCourseStatus());
         } else {
-            throw new invalidStatusException("Course can't be created. Organization status must be APPROVED");
+        throw new invalidStatusException("Course can't be created. Organization status must be APPROVED");
         }
+        
         this.courseRepo.save(course);
         return course;
     }
 
     public void delete(Course course) throws invalidStatusException {
-        if (course.getCourseStatus() == ECourseStatus.ENROLLMENT
-                || course.getCourseStatus() == ECourseStatus.FINALIZED) {
+        if (course.getCourseStatus() != ECourseStatus.IN_PROGRESS) {
             this.courseRepo.delete(course);
         } else {
             throw new invalidStatusException("Can't be deleted. Status must be ENROLLMENT or FINALIZED");
@@ -80,34 +76,40 @@ public class CourseServiceImpl implements CourseService {
         course.setModality(courseForm.getModality());
         course.setCost(courseForm.getCost());
         course.setHours(courseForm.getHours());
+        course.setCategory(courseForm.getCategory());
         course.setQuotas(courseForm.getQuotas());
         course.setScholarshipQuotas(courseForm.getScholarshipQuotas());
-        course.setCourseStatus(ECourseStatus.ENROLLMENT);
         course.setOrg(org);
         return course;
     }
 
     public Iterable<Course> findByCategory(String category) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.courseRepo.findByCategory(category);
     }
 
-    @Override
-    public List<Course> findByStudentAndInProgressStatus(Student student, ECourseStatus courseStatus) {
-        // TODO Auto-generated method stub
-        return null;
+    public Iterable<Course> findByOrg(Long orgId) throws nonExistentIdException {
+        Optional<Organization> optionalOrg = orgRepo.findById(orgId);
+
+        if (Optional.empty().equals(optionalOrg)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Organization org = optionalOrg.get();
+        return this.courseRepo.findByOrg(org);
     }
 
-    @Override
-    public List<Course> findByStudentAndFinalizedStatus(Student student, ECourseStatus courseStatus) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public Iterable<Course> findByCourseStatus(String status) {
 
-    @Override
-    public List<Course> findByCategoryAndOrganization(String category, Organization org) {
-        // TODO Auto-generated method stub
-        return null;
+        switch (status.toUpperCase()) {
+        case "ENROLLMENT":
+            return this.courseRepo.findByCourseStatus(ECourseStatus.ENROLLMENT);
+        case "IN PROGRESS":
+            return this.courseRepo.findByCourseStatus(ECourseStatus.IN_PROGRESS);
+        case "FINALIZED":
+            return this.courseRepo.findByCourseStatus(ECourseStatus.FINALIZED);
+        default:
+            return null;
+        }
     }
 
     @Override
@@ -124,13 +126,14 @@ public class CourseServiceImpl implements CourseService {
         course.setModality(courseForm.getModality());
         course.setCost(courseForm.getCost());
         course.setHours(courseForm.getHours());
+        course.setCategory(courseForm.getCategory());
         course.setQuotas(courseForm.getQuotas());
         course.setScholarshipQuotas(courseForm.getScholarshipQuotas());
 
         return course;
     }
 
-    //This method doesn't override the course status. Remains allways in ENROLLMENT
+    // This method doesn't override the course status. Remains allways in ENROLLMENT
     @Override
     public Course changeCourseStatus(Long id, String status) throws nonExistentIdException {
         Optional<Course> optionalCourse = courseRepo.findById(id);
@@ -142,20 +145,40 @@ public class CourseServiceImpl implements CourseService {
         Course course = optionalCourse.get();
 
         switch (status.toUpperCase()) {
-            case "ENROLLMENT":
-                course.setCourseStatus(ECourseStatus.ENROLLMENT);
-                break;
-            case "IN_PROGRESS":
-                course.setCourseStatus(ECourseStatus.IN_PROGRESS);
-                break;
-            case "FINALIZED":
-                course.setCourseStatus(ECourseStatus.FINALIZED);
-                break;
-            default:
-                break;
+        case "ENROLLMENT":
+            course.setCourseStatus(ECourseStatus.ENROLLMENT);
+            break;
+        case "IN_PROGRESS":
+            course.setCourseStatus(ECourseStatus.IN_PROGRESS);
+            break;
+        case "FINALIZED":
+            course.setCourseStatus(ECourseStatus.FINALIZED);
+            break;
+        default:
+            break;
         }
 
         return course;
+    }
+
+    @Override
+    public Iterable<Course> findByCategoryAndOrganization(String category, Long orgId) {
+
+        try {
+            if (orgId == 0) {
+                return this.findByCategory(category);
+            } else if (category == null) {
+                return this.findByOrg(orgId);
+            } else {
+                // Print all the courses by that specific ogr. Leaving for review
+                Iterable<Course> courseList = this.findByCategory(category);
+                courseList = this.findByOrg(orgId);
+                return courseList;
+            }
+        } catch (nonExistentIdException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

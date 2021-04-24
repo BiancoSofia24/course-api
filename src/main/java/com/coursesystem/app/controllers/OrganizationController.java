@@ -161,7 +161,7 @@ public class OrganizationController {
 	@Operation(summary = "Update organization status", description = "Find an organizations by its ID and then update the organization status.")
 	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> changeOrgStatus(@PathVariable Long id, @RequestParam String status) {
-        log.info("Update organizations status");
+        log.info("Update organization status");
         try {
             log.info("Finding...");
         

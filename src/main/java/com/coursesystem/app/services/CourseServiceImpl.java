@@ -24,7 +24,7 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private AgentRepository agentRepo;
 
-    @Autowired 
+    @Autowired
     private OrganizationRepository orgRepo;
 
     @Autowired
@@ -37,9 +37,19 @@ public class CourseServiceImpl implements CourseService {
     public Course save(Course course) throws invalidStatusException {
         if (course.getOrg().getOrgStatus() == EStatus.APPROVED) {
             this.courseRepo.save(course);
-            return course;
         } else {
             throw new invalidStatusException("Course can't be created. Organization status must be APPROVED");
+        }
+        this.courseRepo.save(course);
+        return course;
+    }
+
+    public void delete(Course course) throws invalidStatusException {
+        if (course.getCourseStatus() == ECourseStatus.ENROLLMENT
+                || course.getCourseStatus() == ECourseStatus.FINALIZED) {
+            this.courseRepo.delete(course);
+        } else {
+            throw new invalidStatusException("Can't be deleted. Status must be ENROLLMENT or FINALIZED");
         }
     }
 
@@ -56,7 +66,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course chargeFormData(CourseForm courseForm) throws nonExistentIdException {
-        Optional<Organization> optionalOrg = orgRepo.findById(courseForm.getOrgID());
+        Optional<Organization> optionalOrg = orgRepo.findById(courseForm.getOrgId());
 
         if (Optional.empty().equals(optionalOrg)) {
             throw new nonExistentIdException("The given id doesn't exists");
@@ -72,13 +82,12 @@ public class CourseServiceImpl implements CourseService {
         course.setHours(courseForm.getHours());
         course.setQuotas(courseForm.getQuotas());
         course.setScholarshipQuotas(courseForm.getScholarshipQuotas());
-        course.setCourseStatus(courseForm.getCourseStatus());
+        course.setCourseStatus(ECourseStatus.ENROLLMENT);
         course.setOrg(org);
         return course;
     }
 
-    @Override
-    public List<Course> findByCategory(String category) {
+    public Iterable<Course> findByCategory(String category) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -100,5 +109,53 @@ public class CourseServiceImpl implements CourseService {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
+    @Override
+    public Course update(CourseForm courseForm, Long id) throws nonExistentIdException {
+        Optional<Course> optionalCourse = courseRepo.findById(id);
+
+        if (Optional.empty().equals(optionalCourse)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Course course = optionalCourse.get();
+        course.setName(courseForm.getName());
+        course.setDescription(courseForm.getDescription());
+        course.setModality(courseForm.getModality());
+        course.setCost(courseForm.getCost());
+        course.setHours(courseForm.getHours());
+        course.setQuotas(courseForm.getQuotas());
+        course.setScholarshipQuotas(courseForm.getScholarshipQuotas());
+
+        return course;
+    }
+
+    //This method doesn't override the course status. Remains allways in ENROLLMENT
+    @Override
+    public Course changeCourseStatus(Long id, String status) throws nonExistentIdException {
+        Optional<Course> optionalCourse = courseRepo.findById(id);
+
+        if (Optional.empty().equals(optionalCourse)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Course course = optionalCourse.get();
+
+        switch (status.toUpperCase()) {
+            case "ENROLLMENT":
+                course.setCourseStatus(ECourseStatus.ENROLLMENT);
+                break;
+            case "IN_PROGRESS":
+                course.setCourseStatus(ECourseStatus.IN_PROGRESS);
+                break;
+            case "FINALIZED":
+                course.setCourseStatus(ECourseStatus.FINALIZED);
+                break;
+            default:
+                break;
+        }
+
+        return course;
+    }
+
 }

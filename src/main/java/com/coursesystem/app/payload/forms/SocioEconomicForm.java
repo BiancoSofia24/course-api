@@ -2,20 +2,11 @@ package com.coursesystem.app.payload.forms;
 
 public class SocioEconomicForm {
     
-    private Long id;
     private Integer studying;
     private Integer working;
     private Float income;
     private Integer familyInCharge;
     private Integer dependents;
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Integer getStudying() {
         return this.studying;

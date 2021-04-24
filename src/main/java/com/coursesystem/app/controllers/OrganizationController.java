@@ -1,6 +1,5 @@
 package com.coursesystem.app.controllers;
 
-import com.coursesystem.app.enums.EStatus;
 import com.coursesystem.app.exceptions.invalidStatusException;
 import com.coursesystem.app.exceptions.nonExistentIdException;
 import com.coursesystem.app.models.Organization;
@@ -13,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,30 +41,23 @@ public class OrganizationController {
     @Operation(summary = "Organizations List", description = "Lists all the organizations in the data base")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('AGENT')")
     public ResponseEntity<Iterable<Organization>> findAll() {
-        log.info("Find all organizations");
-        return new ResponseEntity<>(orgServImpl.findAll(), HttpStatus.OK);
+        try {
+            log.info("Find all organizations");
+            return new ResponseEntity<>(orgServImpl.findAll(), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping(path = "/")
     @Operation(summary = "New organization", description = "Add a new organization to the database.")
     // @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Organization> add(@RequestParam String name, @RequestParam Long cuil, @RequestParam String type, @RequestParam String address, @RequestParam String category, @RequestParam Integer foundationYear, @RequestParam Integer contactNumber, @RequestParam Long agentId) {
+    public ResponseEntity<Organization> add(@RequestBody OrganizationForm orgForm) {
         log.info("Create a new organization");
-        OrganizationForm orgForm = new OrganizationForm();
         try {
             log.info("Requesting data...");
             
-            orgForm.setName(name);
-            orgForm.setCuil(cuil);
-            orgForm.setType(type);
-            orgForm.setAddress(address);
-            orgForm.setCategory(category);
-            orgForm.setFoundationYear(foundationYear);
-            orgForm.setContactNumber(contactNumber);
-            orgForm.setOrgStatus(EStatus.AWAITING_APPROVAL);
-            orgForm.setAgentId(agentId);
-            log.info("Validating...");
-
             Organization org = orgServImpl.chargeFormData(orgForm);
             log.info("Creating...");
 
@@ -83,31 +76,18 @@ public class OrganizationController {
      * @param repForm
      * @return
      */
-    @PutMapping(path = "/update/{id}")
+    @PutMapping(path = "/{id}")
 	@Operation(summary = "Update organization", description = "Find an organization by its ID and then update the info.")
-	// @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
-	public ResponseEntity<Organization> update(@PathVariable Long id, @RequestParam String name, @RequestParam Long cuil, @RequestParam String type, @RequestParam String address, @RequestParam String category, @RequestParam Integer foundationYear, @RequestParam Integer contactNumber, @RequestParam Long agentId) {
+	// @PreAuthorize("hasRole('AGENT')")
+	public ResponseEntity<Organization> update(@PathVariable Long id, @RequestBody OrganizationForm orgForm) {
 
 		log.info("Update an organization");
-        OrganizationForm orgForm = new OrganizationForm();
 		try {
             log.info("Finding...");
 
-            Organization org = orgServImpl.findById(id);
-            log.info("Organization finded!");
-            
-            orgForm.setName(name);
-            orgForm.setCuil(cuil);
-            orgForm.setType(type);
-            orgForm.setAddress(address);
-            orgForm.setCategory(category);
-            orgForm.setFoundationYear(foundationYear);
-            orgForm.setContactNumber(contactNumber);
-            orgForm.setOrgStatus(org.getOrgStatus());
-            orgForm.setAgentId(agentId);
+			Organization org = orgServImpl.update(orgForm, id);
 			log.info("Updating...");
 
-			org = orgServImpl.chargeFormData(orgForm);
 			orgServImpl.save(org);
 			log.info("Organization updated!");
 
@@ -125,16 +105,15 @@ public class OrganizationController {
      * @param id
      * @return
      */
-    @DeleteMapping(path = "/delete/{id}")
-    @Operation(summary = "Delete organization", description = "Find a organization by its ID and then delete the organization.")
+    @DeleteMapping(path = "/{id}")
+    @Operation(summary = "Delete organization", description = "Find an organization by its ID and then delete the organization.")
 	// @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         log.info("Deleting an organization");
-        Organization org;
         try {
             log.info("Finding...");
 
-            org = orgServImpl.findById(id);
+            Organization org = orgServImpl.findById(id);
             log.info("Organization finded! Deleting...");
 
             orgServImpl.delete(org);
@@ -157,14 +136,13 @@ public class OrganizationController {
      * @return
      */
     @GetMapping(path = "/{id}")
-    @Operation(summary = "Find by ID", description = "Find a organization by its ID")
+    @Operation(summary = "Find by ID", description = "Find an organization by its ID")
     public ResponseEntity<Organization> findById(@PathVariable Long id) {
         log.info("Find an organization by the ID: " + id);
-        Organization org;
         try {
             log.info("Finding...");
 
-            org = orgServImpl.findById(id);
+            Organization org = orgServImpl.findById(id);
             log.info("Organization finded!");
 
             return new ResponseEntity<>(org, HttpStatus.OK);
@@ -184,13 +162,11 @@ public class OrganizationController {
 	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> changeOrgStatus(@PathVariable Long id, @RequestParam String status) {
         log.info("Update organizations status");
-		Organization org;
         try {
             log.info("Finding...");
         
-			org = orgServImpl.findById(id);
-            org = orgServImpl.changeOrgStatus(id, status);
-			log.info("Organization finded. Updating scholarship status...");
+            Organization org = orgServImpl.changeOrgStatus(id, status);
+			log.info("Organization finded. Updating organization status...");
 
             orgServImpl.save(org);
             log.info("Organization status updated!");

@@ -1,27 +1,16 @@
 package com.coursesystem.app.payload.forms;
 
-import com.coursesystem.app.enums.ECourseStatus;
-
 public class CourseForm {
 
-    private Long id;
     private String name;
     private String description;
     private String modality;
     private Float cost;
     private Integer hours;
+    private String category;
     private Integer quotas;
     private Integer scholarshipQuotas;
-    private ECourseStatus courseStatus;
     private Long orgId;
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return this.name;
@@ -63,6 +52,14 @@ public class CourseForm {
         this.hours = hours;
     }
 
+    public String getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public Integer getQuotas() {
         return this.quotas;
     }
@@ -79,15 +76,7 @@ public class CourseForm {
         this.scholarshipQuotas = scholarshipQuotas;
     }
 
-    public ECourseStatus getCourseStatus() {
-        return this.courseStatus;
-    }
-
-    public void setCourseStatus(ECourseStatus courseStatus) {
-        this.courseStatus = courseStatus;
-    }
-
-    public Long getOrgID() {
+    public Long getOrgId() {
         return this.orgId;
     }
 

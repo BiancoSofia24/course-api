@@ -11,7 +11,9 @@ public interface StudentService {
     
     public Student chargeFormData(StudentForm studentForm) throws nonExistentIdException;
 
-    public Student chargeSEFormData(SocioEconomicForm seForm, Student student) throws nonExistentIdException;
+    public Student chargeSEFormData(SocioEconomicForm seForm, Long id) throws nonExistentIdException;
     
     public Student changeScholarshipStatus(Long id, String status) throws nonExistentIdException;
+
+    public Student update(StudentForm studentForm, Long studentId) throws nonExistentIdException;
 }

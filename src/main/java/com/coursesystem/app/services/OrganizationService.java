@@ -14,4 +14,5 @@ public interface OrganizationService {
 
     public Organization changeOrgStatus(Long id, String status) throws nonExistentIdException;
 
+    public Organization update(OrganizationForm orgForm, Long id) throws nonExistentIdException;
 }

@@ -1,16 +1,10 @@
 package com.coursesystem.app.controllers;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 import com.coursesystem.app.exceptions.nonExistentIdException;
-import com.coursesystem.app.models.Role;
 import com.coursesystem.app.models.Student;
-import com.coursesystem.app.models.User;
 import com.coursesystem.app.payload.forms.SocioEconomicForm;
 import com.coursesystem.app.payload.forms.StudentForm;
-import com.coursesystem.app.repository.RoleRepository;
 import com.coursesystem.app.services.StudentServiceImpl;
 import com.coursesystem.app.services.UserServiceImpl;
 
@@ -19,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @Service
 @RequestMapping(path = "app/students")
@@ -44,9 +38,6 @@ public class StudentController {
     @Autowired
     private StudentServiceImpl studentServImpl;
 
-    @Autowired
-    private RoleRepository roleRepo;
-
     /**
      * Find all students
      * @return
@@ -55,8 +46,13 @@ public class StudentController {
     @Operation(summary = "Students List", description = "Lists all the students that exits in the database")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Iterable<Student>> findAll() {
-        log.info("Find all students");
-        return new ResponseEntity<>(studentServImpl.findAll(), HttpStatus.OK);
+        try {
+            log.info("Find all students");
+            return new ResponseEntity<>(studentServImpl.findAll(), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
@@ -65,9 +61,9 @@ public class StudentController {
      * @return
      */
     @GetMapping(path = "/{id}")
-    @Operation(summary = "Find by ID", description = "Find an student by its ID")
+    @Operation(summary = "Find by ID", description = "Find a student by its ID")
     public ResponseEntity<Student> findById(@PathVariable Long id) {
-        log.info("Find an student by the ID: " + id);
+        log.info("Find a student by the ID: " + id);
         Student student;
         try {
             log.info("Finding...");
@@ -83,43 +79,20 @@ public class StudentController {
     }
 
     /**
-     * New agent user
-     * @param id
-     * @param name
-     * @param lastname
-     * @param documentType
-     * @param documentNumber
-     * @param job
+     * New student user
+     * @param studentForm
      * @return
      */
     @PostMapping(path = "/")
-    @Operation(summary = "New agent", description = "Add a new agent to the database.")
-    // @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Student> add(@RequestParam Long id, @RequestParam String name, @RequestParam String lastname,@Parameter(description = "dd/MM/yyyy") @RequestParam String birthday, @Parameter(description = "F | M") @RequestParam String gender, @RequestParam String location) {
-        log.info("Create a new agent");
-        StudentForm studentForm = new StudentForm();
+    @Operation(summary = "New student", description = "Add a new student to the database.")
+    // @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Student> add(@RequestBody StudentForm studentForm) {
+        log.info("Create a new student");
         try {
             log.info("Requesting data...");
-            
-            User studentUser = userServImpl.findById(id);
-            studentForm.setId(studentUser.getId());
-            studentForm.setName(name);
-            studentForm.setLastname(lastname);
-            studentForm.setBirthday(birthday);
-            studentForm.setGender(gender);
-            studentForm.setLocation(location);
-
-            // Missing role for the created user
-            Optional<Role> role = roleRepo.findById(3L);
-            role.get().getUserRole();
-            Set<Role> set = new HashSet<Role>();
-            set.add(role.get());
-            studentUser.setRole(set);
-
-            log.info("Validating...");
 
             Student student = studentServImpl.chargeFormData(studentForm);
-            log.info("Creating...");
+            log.info("Validating...");
 
             studentServImpl.save(student);
             log.info("Student created!");
@@ -130,40 +103,25 @@ public class StudentController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
-
+    
     /**
-     * Update an student user
+     * Update a student user
      * @param id
-     * @param name
-     * @param lastname
-     * @param documentType
-     * @param documentNumber
-     * @param job
+     * @param studentForm
      * @return
      */
-    @PutMapping(path = "/update/{id}")
-	@Operation(summary = "Update student", description = "Find an student by its ID and then update the student info.")
-	// @PreAuthorize("hasRole('AGENT')")
-	public ResponseEntity<Student> update(@PathVariable Long id, @RequestParam String name, @RequestParam String lastname,@Parameter(description = "dd/MM/yyyy") @RequestParam String birthday, @Parameter(description = "F | M") @RequestParam String gender, @RequestParam String location) {
+    @PutMapping(path = "/{id}")
+	@Operation(summary = "Update student", description = "Find a student by its ID and then update the student info.")
+	// @PreAuthorize("hasRole('STUDENT')")
+	public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody StudentForm studentForm) {
 
-		log.info("Update an agent");
-        StudentForm studentForm = new StudentForm();
+		log.info("Update an student");
 		try {
             log.info("Finding...");
 
-            User studentUser = userServImpl.findById(id);
-            Student student = studentServImpl.findById(studentUser.getId());
-            log.info("Student finded!");
-            
-            studentForm.setId(studentUser.getId());
-            studentForm.setName(name);
-            studentForm.setLastname(lastname);
-            studentForm.setBirthday(birthday);
-            studentForm.setGender(gender);
-            studentForm.setLocation(location);
+			Student student = studentServImpl.update(studentForm, id);
 			log.info("Updating...");
 
-			student = studentServImpl.chargeFormData(studentForm);
 			studentServImpl.save(student);
 			log.info("Student updated!");
 
@@ -177,37 +135,23 @@ public class StudentController {
 	}
 
     /**
-     * Update an student user with the socialeconomic data
+     * Update a student 
      * @param id
-     * @param name
-     * @param lastname
-     * @param documentType
-     * @param documentNumber
-     * @param job
+     * @param seForm
      * @return
      */
     @PutMapping(path = "/se-data/{id}")
-	@Operation(summary = "Update socioeconomic info", description = "Find an student by its ID and then update the student info with the socialeconomic data.")
-	// @PreAuthorize("hasRole('AGENT')")
-	public ResponseEntity<Student> updateSocioEconomicData(@PathVariable Long id, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer studying, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer working, @RequestParam Float income, @Parameter(description = "0 for NO | 1 for YES") @RequestParam Integer familyInCharge, @RequestParam Integer dependents) {
+	@Operation(summary = "Update socioeconomic info", description = "Find a student by its ID and then update the student info with the socioeconomic data.")
+	// @PreAuthorize("hasRole('STUDENT')")
+	public ResponseEntity<Student> updateSocioEconomicData(@PathVariable Long id, @RequestBody SocioEconomicForm seForm) {
 
 		log.info("Update socioeconomic data from an student");
-        SocioEconomicForm seForm = new SocioEconomicForm();
 		try {
             log.info("Finding...");
 
-            Student student = studentServImpl.findById(id);
-            log.info("Student finded!");
-            
-            seForm.setId(id);
-            seForm.setStudying(studying);
-            seForm.setWorking(working);
-            seForm.setIncome(income);
-            seForm.setFamilyInCharge(familyInCharge);
-            seForm.setDependents(dependents);
-			log.info("Updating...");
+			Student student = studentServImpl.chargeSEFormData(seForm, id);
+            log.info("Validating...");
 
-			student = studentServImpl.chargeSEFormData(seForm, student);
 			studentServImpl.save(student);
 			log.info("Student updated!");
 
@@ -225,17 +169,16 @@ public class StudentController {
      * @param id
      * @return
      */
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/{id}")
 	@Operation(summary = "Delete student", description = "Find a user by its ID and then delete the student.")
 	// @PreAuthorize("hasRole('STUDENT') or hasRole('ADMIN')")
 	public ResponseEntity<Object> delete(@PathVariable Long id) {
 
 		log.info("Delete an student");
-		Student student;
 		try {
             log.info("Finding...");
         
-			student = studentServImpl.findById(id);
+			Student student = studentServImpl.findById(id);
 			log.info("Student finded. Deleting...");
 
 			studentServImpl.delete(student);
@@ -260,12 +203,10 @@ public class StudentController {
 	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> changeScholarshipStatus(@PathVariable Long id, @RequestParam String status) {
         log.info("Update scholarship status");
-		Student student;
         try {
             log.info("Finding...");
             
-			student = studentServImpl.findById(id);
-            student = studentServImpl.changeScholarshipStatus(id, status);
+            Student student = studentServImpl.changeScholarshipStatus(id, status);
 			log.info("Student finded. Updating scholarship status...");
 
             studentServImpl.save(student);

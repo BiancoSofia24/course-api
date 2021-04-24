@@ -28,6 +28,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     public Organization save(Organization org) {
+        if (org.getOrgStatus() == null) {
+            org.setOrgStatus(EStatus.AWAITING_APPROVAL);
+        }
         this.orgRepo.save(org);
         return org;
     }
@@ -70,7 +73,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         org.setCategory(orgForm.getCategory());
         org.setFoundationYear(orgForm.getFoundationYear());
         org.setContactNumber(orgForm.getContactNumber());
-        org.setOrgStatus(orgForm.getOrgStatus());
         org.setAgent(agent);
         return org;
     }
@@ -101,7 +103,29 @@ public class OrganizationServiceImpl implements OrganizationService {
         case "CANCELLED":
             org.setOrgStatus(EStatus.CANCELLED);
             break;
+        default:
+            break;
         }
+
+        return org;
+    }
+
+    @Override
+    public Organization update(OrganizationForm orgForm, Long id) throws nonExistentIdException {
+        Optional<Organization> optionalOrg = orgRepo.findById(id);
+
+        if (Optional.empty().equals(optionalOrg)) {
+            throw new nonExistentIdException("The given id doesn't exists");
+        }
+
+        Organization org = optionalOrg.get();
+        org.setName(orgForm.getName());
+        org.setCuil(orgForm.getCuil());
+        org.setType(orgForm.getType());
+        org.setAddress(orgForm.getAddress());
+        org.setCategory(orgForm.getCategory());
+        org.setFoundationYear(orgForm.getFoundationYear());
+        org.setContactNumber(orgForm.getContactNumber());
 
         return org;
     }

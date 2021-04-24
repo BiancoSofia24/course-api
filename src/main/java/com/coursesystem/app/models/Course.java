@@ -24,6 +24,7 @@ public class Course {
     private String modality;
     private Float cost;
     private Integer hours;
+    private String category;
     private Integer quotas;
     private Integer scholarshipQuotas;
 
@@ -83,6 +84,14 @@ public class Course {
 
     public void setHours(Integer hours) {
         this.hours = hours;
+    }
+
+    public String getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Integer getQuotas() {

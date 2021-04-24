@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,8 +42,13 @@ public class UserController {
     @Operation(summary = "Users List", description = "Lists all the users that exist in the database.")
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> findAll() {
-        log.info("Find all users");
-        return new ResponseEntity<>(userServImpl.findAll(), HttpStatus.OK);
+        try {
+            log.info("Find all users");
+            return new ResponseEntity<>(userServImpl.findAll(), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
@@ -53,25 +59,15 @@ public class UserController {
      * @param password
      * @return
      */
-    @PutMapping(path = "/update/{id}")
+    @PutMapping(path = "/{id}")
     @Operation(summary = "Update user", description = "Find a user by its ID and then update the user info.")
     // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestParam String username, @RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserForm userForm) {
         log.info("Updating an user");
-        User user;
         try {
             log.info("Finding...");
-            user = userServImpl.findById(id);
             
-            log.info("User finded!");
-            
-            UserForm userForm = new UserForm();
-            userForm.setId(user.getId());
-            userForm.setUsername(username);
-            userForm.setEmail(email);
-            userForm.setPassword(password);
-            
-            user = userServImpl.chargeFormData(userForm);
+            User user = userServImpl.update(userForm, id);
             log.info("Updating...");
             
             userServImpl.save(user);
@@ -90,15 +86,14 @@ public class UserController {
      * @param id
      * @return
      */
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/{id}")
     @Operation(summary = "Delete user", description = "Find a user by its ID and then delete the user.")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         log.info("Deleting an user");
-        User user;
         try {
             log.info("Finding...");
 
-            user = userServImpl.findById(id);
+            User user = userServImpl.findById(id);
             log.info("User finded! Deleting...");
 
             userServImpl.delete(user);
@@ -152,4 +147,5 @@ public class UserController {
 
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
+    
 }

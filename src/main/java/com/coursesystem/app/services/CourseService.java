@@ -15,11 +15,13 @@ public interface CourseService {
 
     public Course chargeFormData(CourseForm courseForm) throws nonExistentIdException;
 
-    public List<Course> findByCategory(String category);
+    public Course changeCourseStatus(Long id, String status) throws nonExistentIdException;
 
     public List<Course> findByStudentAndInProgressStatus(Student student, ECourseStatus courseStatus);
     
     public List<Course> findByStudentAndFinalizedStatus(Student student, ECourseStatus courseStatus);
 
     public List<Course> findByCategoryAndOrganization(String category, Organization org);
+
+    public Course update(CourseForm courseForm, Long id) throws nonExistentIdException;
 }

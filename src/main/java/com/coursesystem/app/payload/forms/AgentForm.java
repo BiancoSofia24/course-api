@@ -2,19 +2,19 @@ package com.coursesystem.app.payload.forms;
 
 public class AgentForm {
     
-    private Long id;
+    private Long userId;
     private String name;
     private String lastname;
     private String documentType;
     private Integer documentNumber; 
     private String job;
 
-    public Long getId() {
-        return this.id;
+    public Long getUserId() {
+        return this.userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {

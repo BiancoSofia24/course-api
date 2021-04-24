@@ -9,4 +9,6 @@ public interface AgentService {
     public Agent findById(Long id) throws nonExistentIdException;
     
     public Agent chargeFormData(AgentForm agentForm) throws nonExistentIdException;
+
+    public Agent update(AgentForm agentForm, Long id) throws nonExistentIdException;
 }

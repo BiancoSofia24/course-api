@@ -67,4 +67,20 @@ public class UserServiceImpl implements UserService {
         user.setPassword(userForm.getPassword());
         return user;
     }
+
+    @Override
+    public User update(UserForm userForm, Long id) throws nonExistentIdException {
+        Optional<User> optionalUser = userRepo.findById(id);
+
+        if (Optional.empty().equals(optionalUser)) {
+            throw new nonExistentIdException("The giver id doesn't exists");
+        }
+
+        User user = optionalUser.get();
+        user.setUsername(userForm.getUsername());
+        user.setEmail(userForm.getEmail());
+        user.setPassword(userForm.getPassword());
+
+        return user;
+    }
 }

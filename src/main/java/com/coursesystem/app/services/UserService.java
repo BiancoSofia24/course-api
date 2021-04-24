@@ -13,5 +13,8 @@ public interface UserService {
     public List<User> findAll();
 
     public User chargeFormData(UserForm userForm);
+
+    public User update(UserForm userForm, Long id) throws nonExistentIdException;
+
 }
 
